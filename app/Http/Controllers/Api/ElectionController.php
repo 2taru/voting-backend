@@ -36,6 +36,7 @@ class ElectionController extends Controller
         ]);
 
         return response()->json([
+            'status' => 'ok',
             'message' => 'Election created successfully',
             'election' => $election
         ], 201);
@@ -47,7 +48,10 @@ class ElectionController extends Controller
         $election = Election::find($id);
 
         if (!$election) {
-            return response()->json(['message' => 'Election not found'], 404);
+            return response()->json([
+                'status' => 'ok',
+                'message' => 'Election not found'
+            ], 404);
         }
 
         return response()->json($election);
@@ -76,6 +80,7 @@ class ElectionController extends Controller
         $election->update($validated);
 
         return response()->json([
+            'status' => 'ok',
             'message' => 'Election updated successfully',
             'election' => $election
         ]);
@@ -89,7 +94,10 @@ class ElectionController extends Controller
 
         $election = Election::find($id);
         if (!$election) {
-            return response()->json(['message' => 'Election not found'], 404);
+            return response()->json([
+                'status' => 'ok',
+                'message' => 'Election not found'
+            ], 404);
         }
 
         // onDelete('cascade') у міграції подбає про пов'язаних кандидатів та логи

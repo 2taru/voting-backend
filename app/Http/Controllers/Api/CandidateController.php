@@ -56,6 +56,7 @@ class CandidateController extends Controller
         ]);
 
         return response()->json([
+            'status' => 'ok',
             'message' => 'Candidate added successfully',
             'candidate' => $candidate
         ], 201);
@@ -91,6 +92,7 @@ class CandidateController extends Controller
         $candidate->update($validated);
 
         return response()->json([
+            'status' => 'ok',
             'message' => 'Candidate updated successfully',
             'candidate' => $candidate
         ]);
@@ -107,6 +109,9 @@ class CandidateController extends Controller
 
         $candidate->delete();
 
-        return response()->json(['message' => 'Candidate removed successfully']);
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Candidate removed successfully'
+        ]);
     }
 }

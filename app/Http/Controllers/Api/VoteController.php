@@ -23,6 +23,7 @@ class VoteController extends Controller
         // 1. Перевірка статусу виборів
         if ($election->status !== 'active') {
             return response()->json([
+                'status' => 'ok',
                 'can_vote' => false,
                 'message' => 'Election is not active'
             ]);
@@ -43,12 +44,14 @@ class VoteController extends Controller
 
         if ($hasVoted) {
             return response()->json([
+                'status' => 'ok',
                 'can_vote' => false,
                 'message' => 'User has already voted in this election'
             ]);
         }
 
         return response()->json([
+            'status' => 'ok',
             'can_vote' => true,
             'message' => 'User can vote'
         ]);
@@ -75,6 +78,21 @@ class VoteController extends Controller
             'transaction_hash' => $request->transaction_hash,
         ]);
 
-        return response()->json(['message' => 'Vote logged successfully'], 201);
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Vote logged successfully'
+        ], 201);
+    }
+
+    // GET /api/my-votes
+    public function history(Request $request)
+    {
+        $logs = $request->user()
+            ->votesLogs()
+            ->with('election')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($logs);
     }
 }

@@ -32,4 +32,5 @@ Route::middleware('auth:sanctum')->group(function () {
     // --- Маршрути для Голосування ---
     Route::get('/elections/{id}/vote-status', [App\Http\Controllers\Api\VoteController::class, 'status']);
     Route::post('/elections/{id}/vote', [App\Http\Controllers\Api\VoteController::class, 'store']);
+    Route::get('/my-votes', [App\Http\Controllers\Api\VoteController::class, 'history']);
 });

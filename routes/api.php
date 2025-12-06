@@ -2,14 +2,13 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Middleware\IsAdmin;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // --- Публічні маршрути ---
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// --- Захищені маршрути (вимагають Bearer token) ---
+// --- Захищені маршрути ---
 Route::middleware('auth:sanctum')->group(function () {
     // Auth
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -21,7 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/elections', [App\Http\Controllers\Api\ElectionController::class, 'index']);
     Route::get('/elections/{id}', [App\Http\Controllers\Api\ElectionController::class, 'show']);
 
-    // Вкладені маршрути (контекст виборів)
+    // Вкладені маршрути
     Route::get('/elections/{election_id}/candidates', [App\Http\Controllers\Api\CandidateController::class, 'index']);
     // Маршрути для роботи з конкретним кандидатом
     Route::get('/candidates/{id}', [App\Http\Controllers\Api\CandidateController::class, 'show']);

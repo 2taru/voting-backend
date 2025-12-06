@@ -11,13 +11,12 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    // Реєстрація нового виборця
     public function register(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed', // очікує поле password_confirmation
+            'password' => 'required|string|min:8|confirmed',
             'national_id' => 'required|string|unique:users',
         ]);
 
@@ -26,10 +25,9 @@ class AuthController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'national_id' => $validated['national_id'],
-            'role' => 'voter', // За замовчуванням реєструються виборці
+            'role' => 'voter',
         ]);
 
-        // Одразу видаємо токен після реєстрації
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -41,7 +39,6 @@ class AuthController extends Controller
         ], 201);
     }
 
-    // Вхід у систему
     public function login(Request $request)
     {
         $request->validate([
@@ -57,10 +54,8 @@ class AuthController extends Controller
             ]);
         }
 
-        // Видаляємо старі токени, якщо хочемо дозволити лише одну сесію
         $user->tokens()->delete();
 
-        // Створюємо новий токен
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -72,10 +67,8 @@ class AuthController extends Controller
         ]);
     }
 
-    // Вихід із системи (відкликання токена)
     public function logout(Request $request)
     {
-        // Видаляє токен, який був використаний для цього запиту
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
@@ -84,7 +77,6 @@ class AuthController extends Controller
         ]);
     }
 
-    // Отримання даних поточного користувача
     public function me(Request $request)
     {
         return response()->json($request->user());

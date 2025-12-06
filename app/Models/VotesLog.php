@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VotesLog extends Model
 {
-    // Вказуємо ім'я таблиці явно, бо Laravel може шукати 'votes_logs'
     protected $table = 'votes_log';
 
     protected $fillable = [

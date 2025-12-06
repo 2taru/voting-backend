@@ -17,13 +17,13 @@ class UserController extends Controller
             return response()->json([]);
         }
 
-        $users = User::where('role', 'voter') // Шукаємо тільки серед виборців
+        $users = User::where('role', 'voter')
             ->where(function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
                     ->orWhere('email', 'like', "%{$query}%")
                     ->orWhere('national_id', 'like', "%{$query}%");
             })
-            ->limit(5) // Обмежуємо результати
+            ->limit(5)
             ->get(['id', 'name', 'email', 'national_id']);
 
         return response()->json($users);
@@ -33,25 +33,24 @@ class UserController extends Controller
     public function updateWallet(Request $request)
     {
         $request->validate([
-            'wallet_address' => 'required|string|size:42', // Довжина Eth адреси
+            'wallet_address' => 'required|string|size:42',
         ]);
 
         $user = $request->user();
 
-        // Перевірка, чи ця адреса не зайнята іншим юзером
         $exists = User::where('wallet_address', $request->wallet_address)
             ->where('id', '!=', $user->id)
             ->exists();
 
         if ($exists) {
-            return response()->json(['message' => 'This wallet is already connected to another account'], 422);
+            return response()->json(['message' => 'Цей гаманець вже підключений в іншому акаунті'], 422);
         }
 
         $user->wallet_address = $request->wallet_address;
         $user->save();
 
         return response()->json([
-            'message' => 'Wallet connected successfully',
+            'message' => 'Гаманець успішно підключено',
             'user' => $user
         ]);
     }

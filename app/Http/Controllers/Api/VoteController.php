@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 
 class VoteController extends Controller
 {
-    // Перевірка: чи може поточний користувач голосувати на цих виборах?
     // GET /api/elections/{election_id}/vote-status
     public function status(Request $request, $electionId)
     {
@@ -17,27 +16,17 @@ class VoteController extends Controller
         $election = Election::find($electionId);
 
         if (!$election) {
-            return response()->json(['message' => 'Election not found'], 404);
+            return response()->json(['message' => 'Вибори не знайдено'], 404);
         }
 
-        // 1. Перевірка статусу виборів
         if ($election->status !== 'active') {
             return response()->json([
                 'status' => 'ok',
                 'can_vote' => false,
-                'message' => 'Election is not active'
+                'message' => 'Вибори зараз не активні'
             ]);
         }
 
-        // 2. Перевірка верифікації користувача
-        // if (!$user->is_verified) {
-        //     return response()->json([
-        //         'can_vote' => false,
-        //         'message' => 'User is not verified to vote'
-        //     ]);
-        // }
-
-        // 3. Перевірка, чи вже голосував
         $hasVoted = VotesLog::where('election_id', $electionId)
             ->where('user_id', $user->id)
             ->exists();
@@ -46,26 +35,24 @@ class VoteController extends Controller
             return response()->json([
                 'status' => 'ok',
                 'can_vote' => false,
-                'message' => 'User has already voted in this election'
+                'message' => 'Ви вже голосували в цих виборах'
             ]);
         }
 
         return response()->json([
             'status' => 'ok',
             'can_vote' => true,
-            'message' => 'User can vote'
+            'message' => 'Ви можете голосувати'
         ]);
     }
 
-    // Фіксація факту голосування (викликається ПІСЛЯ успішної відправки транзакції на фронті)
     // POST /api/elections/{election_id}/vote
     public function store(Request $request, $electionId)
     {
         $user = $request->user();
 
-        // Повторна перевірка, щоб точно не дати проголосувати двічі
         if (VotesLog::where('election_id', $electionId)->where('user_id', $user->id)->exists()) {
-            return response()->json(['message' => 'Already voted'], 409); // 409 Conflict
+            return response()->json(['message' => 'Ви вже голосували'], 409);
         }
 
         $request->validate([
@@ -80,7 +67,7 @@ class VoteController extends Controller
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Vote logged successfully'
+            'message' => 'Голос успішно зараховано'
         ], 201);
     }
 

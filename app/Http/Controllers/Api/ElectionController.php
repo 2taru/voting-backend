@@ -8,18 +8,14 @@ use Illuminate\Http\Request;
 
 class ElectionController extends Controller
 {
-    // Отримати список всіх виборів
     public function index()
     {
         $elections = Election::orderBy('created_at', 'desc')->get();
         return response()->json($elections);
     }
 
-    // Створити нові вибори (Тільки для Адміна!)
     public function store(Request $request)
     {
-        // У реальному додатку тут варто додати перевірку: if ($request->user()->role !== 'admin') abort(403);
-
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -32,17 +28,16 @@ class ElectionController extends Controller
             'description' => $validated['description'],
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
-            'status' => 'planned', // За замовчуванням планується
+            'status' => 'planned',
         ]);
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Election created successfully',
+            'message' => 'Вибори успішно створено',
             'election' => $election
         ], 201);
     }
 
-    // Показати конкретні вибори
     public function show($id)
     {
         $election = Election::find($id);
@@ -50,61 +45,51 @@ class ElectionController extends Controller
         if (!$election) {
             return response()->json([
                 'status' => 'ok',
-                'message' => 'Election not found'
+                'message' => 'Вибори не знайдено'
             ], 404);
         }
 
         return response()->json($election);
     }
 
-    // --- НОВИЙ МЕТОД: ОНОВЛЕННЯ ВИБОРІВ ---
     public function update(Request $request, $id)
     {
-        // Тут також потрібна перевірка на адміна
-        // if ($request->user()->role !== 'admin') abort(403);
-
         $election = Election::find($id);
         if (!$election) {
-            return response()->json(['message' => 'Election not found'], 404);
+            return response()->json(['message' => 'Вибори не знайдено'], 404);
         }
 
-        // 'sometimes|required' означає: якщо поле є, воно має бути валідним, але воно не обов'язкове
         $validated = $request->validate([
             'title' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'start_date' => 'sometimes|required|date',
             'end_date' => 'sometimes|required|date|after:start_date',
-            'status' => 'sometimes|required|in:planned,active,completed' // Додаємо оновлення статусу
+            'status' => 'sometimes|required|in:planned,active,completed'
         ]);
 
         $election->update($validated);
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Election updated successfully',
+            'message' => 'Вибори успішно оновлено',
             'election' => $election
         ]);
     }
 
-    // --- НОВИЙ МЕТОД: ВИДАЛЕННЯ ВИБОРІВ ---
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        // Тут також потрібна перевірка на адміна
-        // if ($request->user()->role !== 'admin') abort(403);
-
         $election = Election::find($id);
         if (!$election) {
             return response()->json([
                 'status' => 'ok',
-                'message' => 'Election not found'
+                'message' => 'Вибори не знайдено'
             ], 404);
         }
 
-        // onDelete('cascade') у міграції подбає про пов'язаних кандидатів та логи
         $election->delete();
 
         return response()->json([
-            'message' => 'Election deleted successfully'
+            'message' => 'Вибори успішно видалено'
         ], 200);
     }
 }
